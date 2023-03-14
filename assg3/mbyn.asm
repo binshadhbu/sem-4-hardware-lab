@@ -4,7 +4,7 @@ nod: resb 1 ;For storing the number of digits....
 temp: resb 2
 matrix1: resw 200
 matrix2: resw 200
-matrix3: resw 200
+
 sum:resw 1
 sec:resw 1 
 m: resw 1
@@ -20,6 +20,12 @@ msg3: db "Enter the number of columns in the matrix : "
 msg_size3: equ $-msg3
 msg4: db "Enter the elements second matrix one by one(row by row) : "
 msg_size4: equ $-msg4
+msg5:db "the sum matrix is:"
+size5:equ $-msg5
+msg6:db "the  matrix is 1:"
+size6:equ $-msg6
+msg7:db "the  matrix is 2:"
+size7:equ $-msg7
 tab: db 9 ;ASCII for vertical tab
 new_line: db 10 ;ASCII for new line
 section .text
@@ -88,24 +94,149 @@ mov cx, word[i]
 cmp cx, word[m]
 jb i_loop
 
-
 cmp word[sec],0
 je second_matrix
-
-
 ;Printing each element of the matrix
+mov eax,4
+mov ebx,1
+mov ecx,msg6
+mov edx,size6
+int 80h
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
 mov eax, 0
 mov ebx, matrix1
 mov word[i], 0
 mov word[j], 0
-i_loop2:
+i_loopm1:
 mov word[j], 0
-j_loop2:
+j_loopm1:
 ;mov word[sum],0
 ;eax will contain the array index and each element is 2 bytes(1 word) long
 mov dx, word[ebx + 2 * eax]
 ;
 mov word[num] , dx
+call print_num
+
+;Printing a space after each element.....
+pusha
+mov eax, 4
+mov ebx, 1
+mov ecx, tab
+mov edx, 1
+int 80h
+popa
+inc eax
+inc word[j]
+mov cx, word[j]
+cmp cx, word[n]
+jb j_loopm1
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+
+inc word[i]
+mov cx, word[i]
+cmp cx, word[m]
+jb i_loopm1
+;printing second result
+mov eax,4
+mov ebx,1
+mov ecx,msg7
+mov edx,size7
+int 80h
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+
+mov eax, 0
+mov ebx, matrix2
+mov word[i], 0
+mov word[j], 0
+i_loopm2:
+mov word[j], 0
+j_loopm2:
+;mov word[sum],0
+;eax will contain the array index and each element is 2 bytes(1 word) long
+mov dx, word[ebx + 2 * eax]
+;
+mov word[num] , dx
+call print_num
+
+;Printing a space after each element.....
+pusha
+mov eax, 4
+mov ebx, 1
+mov ecx, tab
+mov edx, 1
+int 80h
+popa
+inc eax
+inc word[j]
+mov cx, word[j]
+cmp cx, word[n]
+jb j_loopm2
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+
+inc word[i]
+mov cx, word[i]
+cmp cx, word[m]
+jb i_loopm2
+
+
+;print result
+mov eax,4
+mov ebx,1
+mov ecx,msg5
+mov edx,size5
+int 80h
+mov eax, 0
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+mov word[i], 0
+mov word[j], 0
+i_loop2:
+mov word[j], 0
+j_loop2:
+mov word[sum],0
+;eax will contain the array index and each element is 2 bytes(1 word) long
+mov ebx, matrix1
+mov dx, word[ebx + 2 * eax]
+mov word[sum],dx
+mov ebx,matrix2
+mov dx, word[ebx + 2 * eax]
+add word[sum],dx
+mov dx,word[sum]
+mov word[num],dx
 call print_num
 
 ;Printing a space after each element.....
