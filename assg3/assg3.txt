@@ -1,0 +1,778 @@
+matrix 
+
+section .bss
+num: resw 1 ;For storing a number, to be read of printed....
+nod: resb 1 ;For storing the number of digits....
+temp: resb 2
+matrix1: resw 200
+matrix2: resw 200
+
+sum:resw 1
+sec:resw 1 
+m: resw 1
+n: resw 1
+i: resw 1
+j: resw 1
+section .data
+msg1: db "Enter the number of rows in the matrix : "
+msg_size1: equ $-msg1
+msg2: db "Enter the elements first matrix one by one(row by row) : "
+msg_size2: equ $-msg2
+msg3: db "Enter the number of columns in the matrix : "
+msg_size3: equ $-msg3
+msg4: db "Enter the elements second matrix one by one(row by row) : "
+msg_size4: equ $-msg4
+msg5:db "the sum matrix is:"
+size5:equ $-msg5
+msg6:db "the  matrix is 1:"
+size6:equ $-msg6
+msg7:db "the  matrix is 2:"
+size7:equ $-msg7
+tab: db 9 ;ASCII for vertical tab
+new_line: db 10 ;ASCII for new line
+section .text
+global _start
+_start:
+mov eax,4
+mov ebx,1
+mov ecx,msg1
+mov edx,msg_size1
+int 80h
+mov ecx, 0
+;calling sub function read num to read a number
+call read_num
+mov cx, word[num]
+mov word[m], cx
+mov eax,4
+mov ebx,1
+mov ecx,msg3
+mov edx,msg_size3
+int 80h
+mov ecx, 0
+call read_num
+mov cx, word[num]
+mov word[n], cx
+mov eax,4
+mov ebx,1
+mov ecx,msg2
+mov edx,msg_size2
+int 80h
+
+mov word[sec],0
+;taking input to matrix
+mov eax, 0
+mov ebx, matrix1
+jmp input
+second_matrix:
+mov eax,4
+mov ebx,1
+mov ecx,msg4
+mov edx,msg_size4
+int 80h
+inc word[sec]
+mov eax, 0
+mov ebx, matrix2
+
+input:
+mov word[i], 0
+mov word[j], 0
+
+i_loop:
+mov word[j], 0
+j_loop:
+call read_num
+mov dx , word[num]
+;eax will contain the array index and each element is 2 bytes(1 word) long
+mov word[ebx + 2 * eax], dx
+inc eax
+;Incrementing array index by one....
+
+inc word[j]
+mov cx, word[j]
+cmp cx, word[n]
+jb j_loop
+inc word[i]
+mov cx, word[i]
+cmp cx, word[m]
+jb i_loop
+
+cmp word[sec],0
+je second_matrix
+;Printing each element of the matrix
+mov eax,4
+mov ebx,1
+mov ecx,msg6
+mov edx,size6
+int 80h
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+mov eax, 0
+mov ebx, matrix1
+mov word[i], 0
+mov word[j], 0
+i_loopm1:
+mov word[j], 0
+j_loopm1:
+;mov word[sum],0
+;eax will contain the array index and each element is 2 bytes(1 word) long
+mov dx, word[ebx + 2 * eax]
+;
+mov word[num] , dx
+call print_num
+
+;Printing a space after each element.....
+pusha
+mov eax, 4
+mov ebx, 1
+mov ecx, tab
+mov edx, 1
+int 80h
+popa
+inc eax
+inc word[j]
+mov cx, word[j]
+cmp cx, word[n]
+jb j_loopm1
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+
+inc word[i]
+mov cx, word[i]
+cmp cx, word[m]
+jb i_loopm1
+;printing second result
+mov eax,4
+mov ebx,1
+mov ecx,msg7
+mov edx,size7
+int 80h
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+
+mov eax, 0
+mov ebx, matrix2
+mov word[i], 0
+mov word[j], 0
+i_loopm2:
+mov word[j], 0
+j_loopm2:
+;mov word[sum],0
+;eax will contain the array index and each element is 2 bytes(1 word) long
+mov dx, word[ebx + 2 * eax]
+;
+mov word[num] , dx
+call print_num
+
+;Printing a space after each element.....
+pusha
+mov eax, 4
+mov ebx, 1
+mov ecx, tab
+mov edx, 1
+int 80h
+popa
+inc eax
+inc word[j]
+mov cx, word[j]
+cmp cx, word[n]
+jb j_loopm2
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+
+inc word[i]
+mov cx, word[i]
+cmp cx, word[m]
+jb i_loopm2
+
+
+;print result
+mov eax,4
+mov ebx,1
+mov ecx,msg5
+mov edx,size5
+int 80h
+mov eax, 0
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+mov word[i], 0
+mov word[j], 0
+i_loop2:
+mov word[j], 0
+j_loop2:
+mov word[sum],0
+;eax will contain the array index and each element is 2 bytes(1 word) long
+mov ebx, matrix1
+mov dx, word[ebx + 2 * eax]
+mov word[sum],dx
+mov ebx,matrix2
+mov dx, word[ebx + 2 * eax]
+add word[sum],dx
+mov dx,word[sum]
+mov word[num],dx
+call print_num
+
+;Printing a space after each element.....
+pusha
+mov eax, 4
+mov ebx, 1
+mov ecx, tab
+mov edx, 1
+int 80h
+popa
+inc eax
+inc word[j]
+mov cx, word[j]
+cmp cx, word[n]
+jb j_loop2
+
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+
+inc word[i]
+mov cx, word[i]
+cmp cx, word[m]
+jb i_loop2
+;Exit System Call.....
+exit:
+mov eax, 1
+mov ebx, 0
+int 80h
+;Function to read a number from console and to store that in num
+read_num:
+pusha
+mov word[num], 0
+loop_read:
+mov eax, 3
+mov ebx, 0
+mov ecx, temp
+mov edx, 1
+int 80h
+cmp byte[temp], 10
+je end_read
+mov ax, word[num]
+mov bx, 10
+mul bx
+mov bl, byte[temp]
+sub bl, 30h
+mov bh, 0
+add ax, bx
+mov word[num], ax
+jmp loop_read
+end_read:
+popa
+ret
+;Function to print any number stored in num...
+print_num:
+pusha
+extract_no:
+cmp word[num], 0
+je print_no
+inc byte[nod]
+mov dx, 0
+mov ax, word[num]
+mov bx, 10
+div bx
+push dx
+mov word[num], ax
+jmp extract_no
+print_no:
+cmp byte[nod], 0
+je end_print
+dec byte[nod]
+pop dx
+mov byte[temp], dl
+add byte[temp], 30h
+
+
+mov eax,4
+mov ebx,1
+mov ecx,temp
+mov edx,1
+int 80h
+
+jmp print_no
+end_print:
+popa
+ret
+
+
+palindrome
+
+section .bss
+	str:resb 300
+	str_len:resb 1
+	ele:resb 1
+	noc:resd 1
+	nod:resd 1
+	dig:resd 1
+	num:resd 1
+
+
+section .data
+	msg1:db 'Enter string :'
+	msg1_len:equ $-msg1
+	pal_msg:db 'It is a palindrome',10
+	pal_len:equ $-pal_msg
+	not_pal:db 'It is NOT a palindrome',10
+	not_len:equ $-not_pal
+	
+section .text
+	global _start:
+	_start:
+
+			mov ecx,msg1
+			mov edx,msg1_len
+			call print_text
+
+			call input_string
+
+			mov esi,str
+			mov edi,str
+			add edi,[noc]
+			dec edi
+			cld 
+
+			palindrome_checker:
+
+			cmpsb
+			jne not_palindrome_print
+
+			sub edi,2
+			dec dword[noc]
+			cmp dword[noc],0
+			jne palindrome_checker
+
+			mov ecx,pal_msg
+			mov edx,pal_len
+			call print_text
+
+			jmp exit
+
+			not_palindrome_print:
+			mov ecx,not_pal
+			mov edx,not_len
+			call print_text
+
+			exit:
+
+			mov eax,1
+			mov ebx,0
+			int 80h
+
+			
+
+	;print
+			print_text:
+			pusha
+			mov eax,4
+			mov ebx,1
+			int 80h
+			popa
+			ret
+
+			
+
+	;Input string
+			input_string:
+			pusha
+			mov edi,str
+			mov dword[noc],0
+			cld
+
+			continue_input:
+
+			mov eax,3
+			mov ebx,0
+			mov ecx,ele
+			mov edx,1
+			int 80h
+
+			cmp byte[ele],10
+			je end_input
+
+			mov al,[ele]
+			stosb
+			inc dword[noc]
+			jmp continue_input
+
+			end_input:
+
+			mov al,0
+			stosb
+
+			popa
+			retsection .bss
+	str:resb 300
+	str_len:resb 1
+	ele:resb 1
+	noc:resd 1
+	nod:resd 1
+	dig:resd 1
+	num:resd 1
+
+
+section .data
+	msg1:db 'Enter string :'
+	msg1_len:equ $-msg1
+	pal_msg:db 'It is a palindrome',10
+	pal_len:equ $-pal_msg
+	not_pal:db 'It is NOT a palindrome',10
+	not_len:equ $-not_pal
+	
+section .text
+	global _start:
+	_start:
+
+			mov ecx,msg1
+			mov edx,msg1_len
+			call print_text
+
+			call input_string
+
+			mov esi,str
+			mov edi,str
+			add edi,[noc]
+			dec edi
+			cld 
+
+			palindrome_checker:
+
+			cmpsb
+			jne not_palindrome_print
+
+			sub edi,2
+			dec dword[noc]
+			cmp dword[noc],0
+			jne palindrome_checker
+
+			mov ecx,pal_msg
+			mov edx,pal_len
+			call print_text
+
+			jmp exit
+
+			not_palindrome_print:
+			mov ecx,not_pal
+			mov edx,not_len
+			call print_text
+
+			exit:
+
+			mov eax,1
+			mov ebx,0
+			int 80h
+
+			
+
+	;print
+			print_text:
+			pusha
+			mov eax,4
+			mov ebx,1
+			int 80h
+			popa
+			ret
+
+			
+
+	;Input string
+			input_string:
+			pusha
+			mov edi,str
+			mov dword[noc],0
+			cld
+
+			continue_input:
+
+			mov eax,3
+			mov ebx,0
+			mov ecx,ele
+			mov edx,1
+			int 80h
+
+			cmp byte[ele],10
+			je end_input
+
+			mov al,[ele]
+			stosb
+			inc dword[noc]
+			jmp continue_input
+
+			end_input:
+
+			mov al,0
+			stosb
+
+			popa
+			ret
+
+
+
+
+            sum of array
+
+
+            section .bss
+	array: resd 50
+	n: resd 1
+	temp: resd 1
+	sum: resd 10
+	
+
+	num: resd 1
+	digit: resb 1
+	length: resd 1
+	a: resd 1
+	b: resd 1
+
+section .data
+	msg1: db "Enter the number of elements : "
+	size1: equ $-msg1
+	msg2: db "Enter a number:"
+	size2: equ $-msg2
+	
+	msg3: db "Average: "
+	size3: equ $-msg3
+	msg4: db "Sum: "
+	size4: equ $-msg4
+	
+	newline: db " ",10
+	newline_size: equ $-newline
+	decimal: db "."
+	decimal_size equ $-decimal
+	
+section .text
+	global _start:
+	_start:
+	pusha
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, msg1
+	mov edx, size1
+	int 80h
+	popa
+	
+	call input
+	mov eax,[num]
+	mov [n],eax
+	
+	mov [temp],eax
+	mov ebx,array
+
+	;reading array
+	read:
+	
+		pusha
+		mov eax, 4
+		mov ebx, 1
+		mov ecx, msg2
+		mov edx, size2
+		int 80h
+		popa
+		
+		push ebx
+		call input
+		pop ebx
+		mov eax,[num]
+		mov [ebx],eax
+		add ebx,4
+		dec byte[temp]
+		cmp byte[temp],0
+		ja read
+
+	mov ebx,array
+	mov eax,[n]
+	mov [temp],eax
+	mov dword[sum],0
+
+	add:
+		mov ecx,dword[ebx]
+		add [sum],ecx
+		dec byte[temp]
+		add ebx,4
+		cmp byte[temp],0
+		jnz add
+
+	; pusha
+	; mov eax,4
+	; mov ebx,1
+	; mov ecx,msg3
+	; mov edx,size3
+	; int 80h
+	; popa
+	
+	; mov eax,[sum]
+	; mov ebx,[n]
+	; div ebx
+	; mov [num],eax
+	; call print_number
+	;print decimals
+
+	; pusha
+	; mov eax,4
+	; mov ebx,1
+	; mov ecx,decimal
+	; mov edx,decimal_size
+	; int 80h
+	; popa
+
+	; mov eax,edx
+	; mov ebx,10
+	; mul ebx
+	; mov ebx,[n]
+	; div ebx
+	; mov [num],eax
+	; call print_number
+
+	; mov eax,edx
+	; mov ebx,10
+	; mul ebx
+	; mov ebx, [n]
+	; div ebx
+	; mov [num],eax
+	; call print_number
+	
+	; mov eax,edx
+	; mov ebx,10
+	; mul ebx
+	; mov ebx, [n]
+	; div ebx
+	; mov [num],eax
+	; call print_number
+
+	; mov eax,4
+	; mov ebx,1
+	; mov ecx,newline
+	; mov edx,newline_size
+	; int 80h
+
+	pusha
+	mov eax,4
+	mov ebx,1
+	mov ecx,msg4
+	mov edx,size4
+	int 80h
+	popa
+	
+	mov eax,[sum]
+	mov [num],eax
+	call print_number
+
+	mov eax,4
+	mov ebx,1
+	mov ecx,newline
+	mov edx,newline_size
+	int 80h
+
+	mov eax,1
+	mov ebx,0
+	int 80h
+
+	;funcs
+	input:
+	pusha
+	mov dword[num],0
+
+	digit_loop:
+	mov eax,3
+	mov ebx,0
+	mov ecx,digit
+	mov edx,1
+	int 80h
+
+	cmp byte[digit],10
+	je end_input
+
+	sub byte[digit],30h
+	mov eax,[num]
+	mov ebx,10
+	mul ebx
+	add eax,dword[digit]
+	mov [num],eax
+
+	jmp digit_loop
+	end_input:
+	popa
+	ret
+
+	print_number:
+	pusha
+	mov dword[length],0
+	cmp dword[num],0
+	je printzero
+
+	get_number:
+	mov edx,0
+	mov eax, [num]
+	mov ebx,10
+	div ebx
+	mov [num],eax
+	push edx
+	inc dword[length]
+	cmp dword[num],0
+	ja get_number
+
+	print_digit:
+	pop edx
+	mov [digit],dl
+
+	add byte[digit],30h
+	mov eax,4
+	mov ebx,1
+	mov ecx,digit
+	mov edx,1
+	int 80h
+
+	dec dword[length]
+	cmp dword[length],0
+	ja print_digit
+
+	jmp end_print
+
+	printzero:
+	mov byte[length],1
+	mov edx, [num]
+	push edx
+	jmp print_digit
+	
+		
+	end_print:
+	popa
+	ret
+	
+	
