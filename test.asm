@@ -1,249 +1,268 @@
-section .data
-	pm : db "Enter m : "
-	lm : equ $-pm
-	pn : db "Enter n : "
-	ln : equ $-pn
-	parr1 : db "Enter Elements Of The Matrix : ",10
-	larr : equ $-parr1
-	parrs : db "The Transpose Of The Matrix Is : ",10
-	larrs : equ $-parrs
-	spc : db 32
-	nl : db 10
+;Write a program to read a mxn matrix with 2 digit numbers and do the following: Start from the top right corner, read the elements of the matrix row wise and store the alternate elements in an array. Compute the sum of the elements in this array and print the result
+;Example: 11 22 33 44 55 66 77 88 99 - array elements are - 33 11 55 99 77 and sum is 275
 
 section .bss
-	t : resw 1
-	a : resw 1
-	b : resw 1
-	n : resw 1
-	m : resw 1
-	beg : resw 1
-	end : resw 1
-	mid : resw 1
-	arr : resw 100
-	flag : resw 1
-	temp : resw 1 
-	count : resb 1
-	prime : resw 1
-	temp_ : resd 1
-	
+num: resw 1 ;For storing a number, to be read of printed....
+nod: resb 1 ;For storing the number of digits....
+temp: resb 2
+matrix: resw 200
+arr: resw 100
+m: resw 1
+n: resw 1
+i: resw 1
+j: resw 1
+index: resd 1
+count: resd 1
+sum: resw 1
+
+section .data
+msg1: db "Enter the number of rows in the matrix: "
+msg_size1: equ $-msg1
+msg2: db "Enter the number of columns in the matrix: "
+msg_size2: equ $-msg2
+msg3: db "Enter the elements one by one(row by row) : "
+msg_size3: equ $-msg3
+msg4: db "Elements of the array are: "
+msg_size4: equ $-msg4
+msg5: db "Required Sum: ", 0xa
+msg_size5: equ $-msg5
+test: db "Test", 0xa
+lenT: equ $ - test
+tab: db 9 ;ASCII for vertical tab
+new_line: db 10 ;ASCII for new line
+space: db 20h
+
 section .text
 global _start
-_start :
-	
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , pm
-	mov edx , lm
-	int 80h	
-	
-	call read 
-	mov ax , word[temp]
-	mov word[m] , ax
 
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , pn
-	mov edx , ln
-	int 80h 
-
-	call read
-	mov ax , word[temp]
-	mov word[n] , ax
-
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , parr1
-	mov edx , larr
+_start:
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, msg1
+	mov edx, msg_size1
 	int 80h
 	
-	mov eax , arr
-	call readMatrix
-
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , parrs
-	mov edx , larrs
-	int 80h
-
-	mov eax , arr
-	call printTrans
-
-	call exit
-
-; Read M x N Matrix
-readMatrix :
-	pusha
-	mov edx , 0
-readMLoop :
-	cmp dx , word[m]
-	je sRMat
-	push edx
-	push eax
-	mov eax , edx
-	mov edx , 0
-	mov bx , word[n]
-	mul bx
-	mov edx, 0
-	mov bx , 2
-	mul bx
-	mov edx , eax
-	pop eax	
-	add eax , edx
-	call readArray
-	sub eax , edx
-	pop edx
-	inc edx
-	jmp readMLoop 
-sRMat :
-	popa
-	ret	
-
-; Print Transpose Of M x N Matrix
-printTrans :
-	pusha
-	mov edx , 0
-pMLoop :
-	cmp dx , word[n]
-	je sPMat
-	push edx
-	mov eax , edx
-	mov bx , 2
-	mul bx
-	mov edx , 0
-	pop edx
-	add eax , arr
-	call printArray
-	inc edx
-	jmp pMLoop 
-sPMat :
-	popa
-	ret
-
-; Read Array Of N Elements
-readArray :
-	pusha
-	mov ebx , 0
-readLoop :
-	cmp bx , word[n] 
-	je sRArr
-	call read
-	mov cx , word[temp] 
-	mov word[eax+2*ebx] , cx
-	inc ebx
-	jmp readLoop
-sRArr :
-	popa
-	ret
-
-; Array Of N Elements
-printArray :
-	pusha 
-	mov ebx , 0
-	mov edx , 0
-printLoop :
-	cmp bx , word[m]
-	je sPArr
-	mov cx , word[eax+2*edx]
-	mov word[temp] , cx
-	call print
-	add dx , word[n]
-	inc ebx
-	jmp printLoop
-sPArr :
-	call printnl
-	popa
-	ret
-
-; Multidigit Read Function
-read :
-	pusha
-	mov word[temp] , 0
-readDigs :
-	mov eax , 3
-	mov ebx , 0
-	mov ecx , t
-	mov edx , 1
+	;mov ecx, 0
+	;calling sub function read num to read a number
+	call read_num
+	mov cx, word[num]
+	mov word[m], cx
+	
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, msg2
+	mov edx, msg_size2
 	int 80h
 	
-	cmp word[t] , 10
-	je sRead
-	cmp word[t] , 32
-	je sRead
-	sub word[t] , 30h
-	mov dx , 0
-	mov ax , word[temp]
-	mov bx , 10
-	mul bx
-	add ax , word[t]
-	mov word[temp] , ax 
-	jmp readDigs
-sRead :
-	popa
-	ret
+	;mov ecx, 0
+	call read_num
+	mov cx, word[num]
+	mov word[n], cx
+	
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, msg3
+	mov edx, msg_size3
+	int 80h
+	
+	;Reading each element of the matrix1........
+	mov eax, 0
+	mov ebx, matrix
+	mov word[i], 0
+	mov word[j], 0
+	
+	i1_loop1:
+		mov word[j], 0
+		
+		j1_loop1:
+			call read_num
+			mov dx , word[num]
+			;eax will contain the array index and each element is 2 bytes(1 word) long
+			mov word[ebx + 2 * eax], dx
+			inc eax ;Incrementing array index by one....
+			inc word[j]
+			mov cx, word[j]
+			cmp cx, word[n]
+			jb j1_loop1
+	
+		inc word[i]
+		mov cx, word[i]
+		cmp cx, word[m]
+		jb i1_loop1
+		
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, msg4
+	mov edx, msg_size4
+	int 0x80
+	
+	;Transposing........
+	mov dword[index], 0
+	mov word[i], 0
+	mov ax, word[n]
+	mov word[j], ax
+	sub word[j], 1
+	mov word[count], 0
+	
+	i3_loop0:
+		
+		j3_loop0:
 
-; Multidigit Print Function
-print : 
+			inc dword[count]
+			movzx eax, word[i]
+			movzx ebx, word[n]
+			mul ebx
+			movzx ecx, word[j]
+			add eax, ecx
+			
+			mov ebx, matrix
+			mov cx, word[ebx+2*eax]
+			
+			mov eax, dword[index]
+			mov ebx, arr
+			mov word[ebx+2*eax], cx
+			inc dword[index]
+			
+			cmp word[j], 1
+			je evenRow
+			cmp word[j], 0
+			je oddRow 
+			
+			sub word[j], 2
+			jmp j3_loop0
+	
+		
+		evenRow:
+			mov ax, word[n]
+			mov word[j], ax
+			sub word[j], 1
+			jmp toNext
+			
+		oddRow:
+			mov ax, word[n]
+			mov word[j], ax
+			sub word[j], 2
+			jmp toNext
+		
+		toNext:
+		inc word[i]
+		mov cx, word[i]
+		cmp cx, word[m]
+		jb i3_loop0
+	
+	mov word[sum], 0
+	mov ebx, arr
+	mov eax, 0
+	
+	PAloop:
+		mov cx, word[ebx+2*eax]
+		mov word[num], cx
+		add word[sum], cx
+		
+		call print_num
+		inc eax
+		cmp eax, dword[count]
+		je endPAloop
+		jmp PAloop
+	
+	endPAloop:
+		mov eax, 4
+		mov ebx, 1
+		mov ecx, new_line
+		mov edx, 1
+		int 0x80
+		
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, msg5
+	mov edx, msg_size5
+	int 0x80
+	
+	mov cx, word[sum]
+	mov word[num], cx
+	call print_num
+	
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, new_line
+	mov edx, 1
+	int 0x80
+		
+	mov eax, 1
+	int 0x80
+		
+	
+	
+;Exit System Call.....
+exit:
+	mov eax, 1
+	mov ebx, 0
+	int 80h
+	
+;Function to read a number from console and to store that in num
+read_num:
 	pusha
-	mov byte[count] , 0
-	cmp word[temp] , 0
-	je printZero
-splitDigs :
-	cmp word[temp] , 0 
-	je printDigs
-	mov edx , 0 
-	mov ax , word[temp]
-	mov bx , 10
-	div bx
-	push edx
-	mov word[temp] , ax
-	inc byte[count] 
-	jmp splitDigs	
-printDigs :
-	cmp byte[count] , 0
-	je sPrint
-	pop edx 
-	mov word[t] , dx
-	add word[t] , 30h
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , t
-	mov edx , 1
-	int 80h
-	dec byte[count]
-	jmp printDigs
-printZero :
-	add word[temp] , 30h
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , temp 
-	mov edx , 1
-	int 80h
-sPrint : 
-	call printsp
-	popa
+	mov word[num], 0
+
+	loop_read:
+		mov eax, 3
+		mov ebx, 0
+		mov ecx, temp
+		mov edx, 1
+		int 80h
+		cmp byte[temp], 10
+		je end_read
+		cmp byte[temp], 20h
+		je end_read
+		mov ax, word[num]
+		mov bx, 10
+		mul bx
+		mov bl, byte[temp]
+		sub bl, 30h
+		mov bh, 0
+		add ax, bx
+		mov word[num], ax
+		jmp loop_read
+	
+	end_read:
+		popa
 	ret
 
-printnl :
+;Function to print any number stored in num...
+print_num:
 	pusha
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , nl
-	mov edx , 1
-	int 80h
-	popa
-	ret
 
-printsp :
-	pusha
-	mov eax , 4
-	mov ebx , 1
-	mov ecx , spc
-	mov edx , 1
-	int 80h
-	popa
-	ret
+	extract_no:
+		inc byte[nod]
+		mov dx, 0
+		mov ax, word[num]
+		mov bx, 10
+		div bx
+		push dx
+		mov word[num], ax
+		cmp word[num], 0
+		je print_no
+		jmp extract_no
 
-exit : 
-	mov eax , 1
-	mov ebx , 0
-	int 80h
+	print_no:
+		cmp byte[nod], 0
+		je end_print
+		dec byte[nod]
+		pop dx
+		mov byte[temp], dl
+		add byte[temp], 30h
+		mov eax, 4
+		mov ebx, 1
+		mov ecx, temp
+		mov edx, 1
+		int 80h
+		jmp print_no
+	
+	end_print:
+		mov eax, 4
+		mov ebx, 1
+		mov ecx, space
+		mov edx, 1
+		int 0x80
+		popa
+	ret
