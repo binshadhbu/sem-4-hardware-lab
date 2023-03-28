@@ -315,8 +315,6 @@ dec byte[nod]
 pop dx
 mov byte[temp], dl
 add byte[temp], 30h
-
-
 mov eax,4
 mov ebx,1
 mov ecx,temp
