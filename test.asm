@@ -68,16 +68,11 @@ mov eax,0
 mov word[i],0
 mov word[j],0
 i_loop1:
-mov ax,word[i]
-mov bx,2
-mul bx
-mov word[tran_index],ax
-add eax,word[tran_index]
+mov eax,0
 mov word[j],0
 j_loop1:
+
 mov cx,word[ebx+2*eax]
-inc eax
-inc word[j]
 mov word[num],cx
 call print_num
 pusha
@@ -86,10 +81,21 @@ mov ebx,1
 mov ecx,tab
 mov edx,1
 int 80h
-
+popa
+add ax,word[n]
+inc word[j]
 mov cx,word[j]
 cmp cx,word[m]
 jb j_loop1
+pusha
+mov eax,4
+mov ebx,1
+mov ecx,new_line
+mov edx,1
+int 80h
+popa
+inc ebx
+inc ebx
 inc word[i]
 mov cx,word[i]
 cmp cx,word[n]
