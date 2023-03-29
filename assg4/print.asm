@@ -38,11 +38,8 @@ call read_array
 
 
 
-mov eax, 4
-mov ebx, 1
-mov ecx, msg2
-mov edx, size2
-int 80h
+
+
 
 call read_num
 mov ax,word[num]
